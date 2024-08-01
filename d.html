@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IconDownloader.com - Downloader</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        input[type="text"],
+        select {
+            background-color: #1a202c;
+            color: white;
+            border-color: #4a5568;
+        }
+
+        .recommended-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .recommended {
+            background-color: #2d3748;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+        }
+
+        .spinner {
+            border: 8px solid rgba(0, 0, 0, 0.1);
+            border-left: 8px solid #ffffff;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            animation: spin 1.5s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 18px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body class="flex bg-gray-900 text-white">
+    <!-- Sidebar -->
+    <div class="w-64 bg-gray-800 text-white p-6 flex flex-col justify-between">
+        <div>
+            <div class="text-3xl font-bold mb-10">IconDownloader</div>
+            <ul>
+                <li class="mb-4"><a href="index.html" class="block hover:text-gray-400"><i class="fas fa-home mr-2"></i>Home</a></li>
+                <li class="mb-4"><a href="downloader.html" class="block hover:text-gray-400"><i class="fas fa-download mr-2"></i>Downloader</a></li>
+                <li class="mb-4"><a href="#" class="block hover:text-gray-400"><i class="fas fa-cube mr-2"></i>Extension</a></li>
+                <li class="mb-4"><a href="about.html" class="block hover:text-gray-400"><i class="fas fa-info mr-2"></i>About</a></li>
+                <li class="mb-4"><a href="faq.html" class="block hover:text-gray-400"><i class="fas fa-question mr-2"></i>FAQ</a></li>
+            </ul>
+        </div>
+        <footer class="text-gray-400 text-sm">
+            <ul class="mt-8">
+                <li class="mb-2"><a href="#" class="hover:underline">Privacy</a></li>
+                <li class="mb-2"><a href="#" class="hover:underline">Terms</a></li>
+                <li class="mb-2"><a href="#" class="hover:underline">Contact</a></li>
+                <li class="mb-2">&copy; 2024 IconDownloader</li>
+            </ul>
+            <div class="flex mt-8">
+                <a href="#" class="text-gray-400 hover:text-gray-300 mr-4"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="text-gray-400 hover:text-gray-300 mr-4"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="text-gray-400 hover:text-gray-300 mr-4"><i class="fab fa-instagram"></i></a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Content -->
+    <div class="flex-1 p-10 overflow-y-auto">
+        <div class="bg-blue-500 py-16 text-center mb-8 rounded-lg shadow-lg">
+            <div class="container mx-auto">
+                <h1 class="text-4xl text-white font-bold mb-4">Download Your Icons Here!</h1>
+                <p class="text-white text-lg mb-4">Download any website icon in various formats: JPG, PNG, TIF, BMP.</p>
+                <p class="text-white text-lg mb-4">It's free!</p>
+                <div class="max-w-lg mx-auto">
+                    <input type="text" id="urlInput" placeholder="Enter website URL"
+                        class="w-full rounded-lg px-4 py-2 shadow-sm focus:outline-none focus:ring focus:ring-blue-400">
+                    <select id="formatSelect"
+                        class="block w-full mt-2 rounded-lg px-4 py-2 shadow-sm focus:outline-none focus:ring focus:ring-blue-400">
+                        <option value="png">PNG</option>
+                        <option value="jpg">JPG</option>
+                        <option value="tif">TIF</option>
+                        <option value="bmp">BMP</option>
+                    </select>
+                    <button type="submit" onclick="downloadIcon()"
+                        class="bg-blue-600 text-white font-bold py-2 px-4 rounded-full mt-4 shadow-lg hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-400">Download Icon</button>
+                    <p id="result" class="text-green-500 mt-2"></p>
+                </div>
+                <p class="text-white text-xl mt-10 mb-4">Popular Sites</p>
+                <div class="recommended-container">
+                    <div class="recommended" onclick="setUrl('https://www.facebook.com')">facebook.com</div>
+                    <div class="recommended" onclick="setUrl('https://www.instagram.com')">instagram.com</div>
+                    <div class="recommended" onclick="setUrl('https://www.youtube.com')">youtube.com</div>
+                    <div class="recommended" onclick="setUrl('https://www.x.com')">x.com</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Wait a moment, downloading...</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <script>
+        function getQueryParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const urlInput = document.getElementById('urlInput');
+            const urlParam = getQueryParameter('url');
+            if (urlParam) {
+                urlInput.value = decodeURIComponent(urlParam);
+            }
+        });
+
+        function setUrl(url) {
+            document.getElementById('urlInput').value = url;
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function downloadIcon() {
+            const url = document.getElementById('urlInput').value;
+            const format = document.getElementById('formatSelect').value;
+
+            if (!url) {
+                alert('Please enter a valid URL.');
+                return;
+            }
+
+            showLoading();
+
+            setTimeout(() => {
+                const completeUrl = url.startsWith('http://') || url.startsWith('https://') ? url : 'https://' + url;
+                const iconUrl = `https://favicon.yandex.net/favicon/${new URL(completeUrl).hostname}/128x128.${format}`;
+
+                fetch(iconUrl)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error fetching icon.');
+                        }
+                        return response.blob();
+                    })
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = url;
+                        a.download = `icon.${format}`;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        document.getElementById('result').innerText = 'Icon downloaded successfully.';
+                        hideLoading();
+                    })
+                    .catch(error => {
+                        console.error('Error downloading icon:', error);
+                        document.getElementById('result').innerText = 'Error downloading icon.';
+                        hideLoading();
+                    });
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>
